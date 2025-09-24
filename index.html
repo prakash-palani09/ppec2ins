@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Express + JS AWS Demo</title>
+</head>
+<body>
+  <h1>Express.js + Plain JS Demo</h1>
+
+  <input type="text" id="msgInput" placeholder="Enter message">
+  <button onclick="sendMessage()">Send</button>
+
+  <ul id="messages"></ul>
+
+  <script>
+    const API_URL = "http://<EC2_PUBLIC_IP>:5000/messages";
+
+    // Fetch messages on load
+    async function fetchMessages() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const ul = document.getElementById("messages");
+      ul.innerHTML = "";
+      data.forEach(msg => {
+        const li = document.createElement("li");
+        li.textContent = msg.text;
+        ul.appendChild(li);
+      });
+    }
+
+    // Send new message
+    async function sendMessage() {
+      const input = document.getElementById("msgInput");
+      const text = input.value;
+      if (!text) return;
+
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      input.value = "";
+      fetchMessages();
+    }
+
+    fetchMessages();
+  </script>
+</body>
+</html>
